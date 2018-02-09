@@ -42,7 +42,7 @@ float euler[3];         // [psi, theta, phi]    Euler angle container
 float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
 
 // packet structure for InvenSense teapot demo
-char teapotPacket[14] = { '$', 0x02, 0,0, 0,0, 0,0, 0,0, 0x00, 0x00,'\r', '\n' };
+char teapotPacket[15] = { '$', 0x02, 0,0, 0,0, 0,0, 0,0,0, 0x00, 0x00,'\r', '\n' };
 
 char TELEMETRY_SERVER_IP[] = "192.168.14.62";
 short TELEMETRY_SERVER_PORT = 6060;
@@ -227,9 +227,9 @@ void loop() {
             teapotPacket[7] = fifoBuffer[9];
             teapotPacket[8] = fifoBuffer[12];
             teapotPacket[9] = fifoBuffer[13];
-            //teapotPacket[10] = (uint8_t)height;
-            Serial.write(teapotPacket, 14);
-            teapotPacket[11]++; // packetCount, loops at 0xFF on purpose
+            teapotPacket[10] = (uint8_t)(height/10);
+            Serial.write(teapotPacket, 15);
+            teapotPacket[12]++; // packetCount, loops at 0xFF on purpose
         #endif
     }
 
@@ -242,6 +242,6 @@ void loop() {
 
      // send back a reply, to the IP address and port we got the packet from
      Udp.beginPacket(TELEMETRY_SERVER_IP, TELEMETRY_SERVER_PORT);
-     Udp.write(teapotPacket);
+     Udp.write(teapotPacket,sizeof(teapotPacket));
      Udp.endPacket();     
 }
