@@ -176,59 +176,6 @@ void receive( byte[] data, String ip, int port ) {
 }
 
 
-void receive__( byte[] data, String ip, int port ) {  // <-- extended handler
-  
-  interval = millis();
-  //while (port.available() > 0) {
-   for (int serialCount=0; serialCount<15;serialCount++) {
-        int ch = data[serialCount] & 0xFF;        
-        if (ch == '$') {serialCount = 0;} // this will help with alignment
-        if (aligned < 4) {
-            // make sure we are properly aligned on a 14-byte packet
-            if (serialCount == 0) {
-                if (ch == '$') aligned++; else aligned = 0;
-            } else if (serialCount == 1) {
-                if (ch == 2) aligned++; else aligned = 0;
-            } else if (serialCount == 13) {
-                if (ch == '\r') aligned++; else aligned = 0;
-            } else if (serialCount == 14) {
-                if (ch == '\n') aligned++; else aligned = 0;
-            }
-            //println(ch + " " + aligned + " " + serialCount);
-            //serialCount++;
-            if (serialCount == 15) serialCount = 0;
-        } else {
-            if (serialCount > 0 || ch == '$') {
-                teapotPacket[serialCount++] = (char)ch;
-                if (serialCount == 15) {
-                    serialCount = 0; // restart packet byte position
-                    for (int k=0;k<15;k++) {
-                      print((int)teapotPacket[k]);
-                      print(",");
-                    }
-                    println("finish");
-                    
-                    // get quaternion from data packet
-                    q[0] = ((teapotPacket[2] << 8) | teapotPacket[3]) / 16384.0f;
-                    q[1] = ((teapotPacket[4] << 8) | teapotPacket[5]) / 16384.0f;
-                    q[2] = ((teapotPacket[6] << 8) | teapotPacket[7]) / 16384.0f;
-                    q[3] = ((teapotPacket[8] << 8) | teapotPacket[9]) / 16384.0f;
-                    int height = teapotPacket[10] * 10;
-                    for (int i = 0; i < 4; i++) if (q[i] >= 2) q[i] = -4 + q[i];
-                    // get the "real" message =
-                    println("Height:",height);
-                    println("q[0]:",q[0]);
-                    println("q[1]:",q[1]);
-                    //println("q[2]:",q[2]);
-                    //println("q[3]:",q[3]);
-                    
-                    // set our toxilibs quaternion to new data
-                    quat.set(q[0], q[1], q[2], q[3]);                   
-                }
-            }
-        }
-    } 
-}
 
 /*
 void serialEvent(Serial port) {  
