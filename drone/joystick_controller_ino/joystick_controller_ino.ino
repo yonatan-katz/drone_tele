@@ -1,9 +1,9 @@
 
-
-int gas_vertical = 0;     // potentiometer wiper (middle terminal) connected to analog pin 3
-int pos_vertical = 1;     // potentiometer wiper (middle terminal) connected to analog pin 3
-int gas_horizont = 2;     // potentiometer wiper (middle terminal) connected to analog pin 3
-int pos_horizont = 3;     // potentiometer wiper (middle terminal) connected to analog pin 3
+//black GND,white 3.3V 
+int gas_vertical = 0;     // green
+int gas_horizont = 1;     // yellow
+int pos_vertical = 2;     // grey
+int pos_horizont = 3;     // white
                          
 char teapotPacket[10] = { '$', 0x02, 0, 0, 0, 0, 0x00, 0x00,'\r', '\n' };
 
@@ -24,8 +24,9 @@ void loop()
   Serial.write()
   */
 
-  Serial.println(analogRead(gas_vertical));
-  Serial.println(analogRead(pos_vertical));
-  Serial.println(analogRead(gas_horizont));
-  Serial.println(analogRead(pos_horizont));
+  Serial.print(analogRead(gas_vertical));Serial.print(",");
+  Serial.print(analogRead(gas_horizont));Serial.print(",");
+  Serial.print(analogRead(pos_vertical));Serial.print(",");
+  Serial.print(analogRead(pos_horizont));Serial.print(",");
+  Serial.println("");
 }
