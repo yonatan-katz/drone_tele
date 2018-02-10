@@ -8,11 +8,12 @@ Created on Fri Feb  9 15:24:22 2018
 
 import socket
 import sys
+import serial
 
 BIND_IP = "192.168.14.62"
 BIND_PORT = 6060
 
-def handle_tele_message(data):
+def handle_udp_tele_message(data):
     teapotPacket  = []
     q = range(4)
     for j in xrange(15):
@@ -35,11 +36,9 @@ def handle_tele_message(data):
     
 
         
-    
-   
 
 
-def main():
+def udp_channel():
     # Create a TCP/IP socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
@@ -50,11 +49,60 @@ def main():
     while True:
         data, address = sock.recvfrom(4096)
         print("Got data len:{}".format(len(data)),data.__class__)
-        handle_tele_message(data)
+        handle_udp_tele_message(data)
+        
+
+def handle_serial_message(data):
+    print(data)
+        
+        
+def serial_channel(port="/dev/ttyUSB0"):
+    
+    ser = serial.Serial()
+    ser.port = port
+    ser.baudrate = 115200
+    ser.bytesize = serial.EIGHTBITS #number of bits per bytes
+    ser.parity = serial.PARITY_NONE #set parity check: no parity
+    ser.stopbits = serial.STOPBITS_ONE #number of stop bits
+    ser.timeout = None          #block read        
+    ser.xonxoff = False     #disable software flow control
+    ser.rtscts = False     #disable hardware (RTS/CTS) flow control
+    ser.dsrdtr = False    #disable hardware (DSR/DTR) flow control  
+    
+
+
+    try: 
+        ser.open()
+    except Exception, e:
+            print "error open serial port: " + str(e)
+            exit() 
+    DOLLAR=36    
+    state = "start"
+    D = []
+    while True:        
+        ch = ord(ser.read(1))       
+        if ch==DOLLAR:
+            state = "$"        
+        elif ch==2 and state == "$":
+            state="DATA"
+            
+        elif state=="DATA":
+            D.append(ch*3)
+            if len(D) == 4:
+                handle_serial_message(D)
+                D = []
+                state = "start"
+        
+            
+        
+                
+          
+        
+    
         
         
         
         
 if __name__=="__main__":
-    main()
+    serial_channel()
     
